@@ -1,0 +1,8 @@
+{"types": [
+    {"name": "image", "extensions": ["png", "jpg", "jpeg"]},
+    {"name": "text", "extensions": ["txt"]},
+    {"name": "pdf", "extensions": ["pdf"]},
+    {"name": "video", "extensions": ["mp4", "m4a", "webm"]},
+    {"name": "audio", "extensions": ["mp3", "aac"]},
+    {"name": "generic", "extensions": [""]}
+]}
