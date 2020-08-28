@@ -13,12 +13,14 @@ class CreateFoldersTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('folders');
         Schema::create('folders', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->foreignId("user_id");
             $table->foreignUuid("parent_id")->nullable();
             $table->string("name");
             $table->softDeletes('deleted_at', 0);
+            $table->foreignId("type_id")->references("id")->on("folder_types");
             $table->timestamps();
         });
     }

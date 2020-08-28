@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\User;
 use App\Folder;
+use Illuminate\Support\Facades\DB;
 
 class UserObserver
 {
@@ -17,10 +18,14 @@ class UserObserver
     {
         if ($user->email == "guest") return;
 
-        $folder = new Folder();
-        $folder->user_id = $user->id;
-        $folder->name = "root";
-        $folder->save();
+        foreach(["root", "trash"] as $type) {
+            $folder = new Folder();
+            $folder->user_id = $user->id;
+            $folder->name = $type;
+            $folder->type_id = DB::select("select id from folder_types where name = '{$type}'", [1])[0]->id;
+
+            $folder->save();
+        }
     }
 
     /**

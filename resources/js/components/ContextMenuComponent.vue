@@ -1,6 +1,6 @@
 <template>
     <div class="context-wrapper">
-        <div id="context-menu" :data-selected-id="id" v-bind:class="{ hidden: hidden }" class="absolute z-10 bg-white">
+        <div id="context-menu" :data-selected-ids="ids" v-bind:class="{ hidden: hidden }" class="absolute z-10 bg-white">
             <div v-on:click="previewFile" class="preview-wrapper">
                 <span class="preview-icon">
                 </span>
@@ -16,13 +16,13 @@
                 </span>
                 <div>Download</div>
             </div>
-            <div v-on:click="$emit('trash-file', id)" class="trash-wrapper">
+            <div v-on:click="$emit('trash-file', ids)" class="trash-wrapper">
                 <span class="trash-icon">
                 </span>
                 <div>Move to trash</div>
             </div>
             <div class="separator"></div>
-            <div v-on:click="$emit('show-properties', id)" class="properties-wrapper">
+            <div v-on:click="$emit('show-properties', ids)" class="properties-wrapper">
                 <span class="properties-icon">
                 </span>
                 <div>Properties</div>
@@ -43,7 +43,7 @@
 <script>
 
 export default {
-    props: ["hidden", "id"],
+    props: ["hidden", "ids"],
     data: function () {
         return {
 
@@ -54,7 +54,11 @@ export default {
     },
     methods: {
         downloadFile() {
-            window.location.pathname = `/download/${this.id}`;
+            console.log(this.ids);
+            // TODO
+            for (let item of this.ids.split(",")) {
+                window.location.pathname = `/download/${this.ids}`;
+            }
             this.hidden = true;
         },
         previewFile() {

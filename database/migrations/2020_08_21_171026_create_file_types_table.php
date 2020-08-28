@@ -15,7 +15,7 @@ class CreateFileTypesTable extends Migration
     {
         Schema::create('file_types', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
+            $table->string("name")->unique();
             $table->string("allowed_types")->comment("comma-seperated (i.e. png,jpg,jpeg)");
         });
     }

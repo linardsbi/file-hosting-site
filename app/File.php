@@ -14,6 +14,6 @@ class File extends Model
     ];
 
     public function folder() {
-        return $this->hasOne("App\Folder");
+        return $this->hasOne("App\Folder", "id", "folder_id");
     }
 }

@@ -39,6 +39,12 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     public function rootFolder() {
-        return Folder::where([["name", "root"], ["user_id", $this->id]])->first();
+        // todo: fix magic numbers
+        return Folder::where([["type_id", 1], ["user_id", $this->id]])->first();
+    }
+
+    public function getTrashFolder() {
+        // todo: fix magic numbers
+        return Folder::where([["type_id", 2], ["user_id", $this->id]])->first();
     }
 }

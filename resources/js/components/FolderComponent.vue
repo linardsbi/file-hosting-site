@@ -1,7 +1,7 @@
 <template>
     <div id="folder" class="min-h-screen flex">
-        <vue-dropzone :include-styling="false" ref="dropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-file-added="onAdd" v-on:vdropzone-sending="onSend"></vue-dropzone>
-        <context-menu v-on:trash-file="trashFile" v-on:create-new-folder="createFolder" :id="selectedFile" :hidden="contextMenuHidden"></context-menu>
+        <vue-dropzone :include-styling="false" ref="dropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-sending="onSend" v-on:vdropzone-success="onUploadSuccess" v-on:vdropzone-file-added-manually="handleFileAdd"></vue-dropzone>
+        <context-menu v-on:trash-file="trashFile" v-on:create-new-folder="createFolder" :ids="selectedItems" :hidden="contextMenuHidden"></context-menu>
     </div>
 </template>
 <script>
@@ -22,7 +22,7 @@ export default {
                 }
             },
             contextMenuHidden: true,
-            selectedFile: "",
+            selectedItems: "",
             dzitems: [],
         }
     },
@@ -32,14 +32,15 @@ export default {
     methods: {
         handleDblclick(e, item) {
             console.log(e);
-            if (item.type === "folder" || item.type === "upOne") {
+            if (item.itemType === "folder" || item.itemType === "upOne") {
                 window.location.pathname = `/${item.id}`;
             } else {
                 this.$emit('preview-file', item.id);
             }
         },
 
-        onAdd(file) {
+        handleFileAdd(file) {
+            console.log(file);
             this.dzitems.push(file);
 
             const updateElement = (elName, data) => {
@@ -55,13 +56,38 @@ export default {
                 this.handleDblclick(e, file);
             });
 
-            if (file.type === "upOne") return;
+            if (file.itemType === "upOne") {
+                file.previewElement.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    window.location.pathname = `/${file.id}`;
+                });
+
+                return;
+            } else {
+                file.previewElement.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    if (!e.ctrlKey) {
+                        for (let item of document.getElementById("dropzone").querySelectorAll(".highlighted")) {
+                            item.classList.remove("highlighted");
+                        }
+                    }
+
+                    file.previewElement.classList.toggle("highlighted");
+                });
+            }
 
             file.previewElement.addEventListener("contextmenu", (e) => {
                 e.preventDefault();
                 this.openContextMenu(e, file);
             });
         },
+
+        onUploadSuccess(file, response) {
+            file.id = response.id;
+            file.itemType = response.type;
+            this.handleFileAdd(file);
+        },
+
         template: function () {
             return `<div class="dz-preview dz-file-preview">
                 <span class="hidden" data-id=""></span>
@@ -83,7 +109,10 @@ export default {
 
         openContextMenu(e, file) {
             this.contextMenuHidden = false;
-            this.selectedFile = file.id;
+            for (let item of document.getElementById("dropzone").querySelectorAll(".highlighted")) {
+                // not cool!
+                this.selectedItems += `,${item.children[0].innerText}`;
+            }
 
             const menu = document.getElementById("context-menu");
             menu.style.left = `${e.clientX}px`;
@@ -95,7 +124,7 @@ export default {
         //onSuccess(file, response) {},
 
         async loadFolder() {
-            const response = await fetch(`/api/${this.folder_id}`).then(value => value.json());
+            const response = await fetch(`/folder/${this.folder_id}`).then(value => value.json());
 
             if (response.parent_id !== "") {
                 this.$refs.dropzone.manuallyAddFile({
@@ -103,7 +132,7 @@ export default {
                     size: 0,
                     name: "Up",
                     date: "",
-                    type: "upOne",
+                    itemType: "upOne",
                 }, ``);
             }
 
@@ -113,7 +142,7 @@ export default {
                     size: 0,
                     name: item.name,
                     date: item.created_at,
-                    type: "folder",
+                    itemType: "folder",
                 }, ``);
             }
             for (let item of response.files) {
@@ -122,36 +151,41 @@ export default {
                     size: item.bytes,
                     name: item.real_name,
                     date: item.created_at,
-                    type: "file",
+                    itemType: "file",
                 }, `/api/preview/${item.id}`);
             }
         },
 
         async createFolder(name = "none") {
             const request = await axios.post(
-                `/folders/create`, {
+                `/folder/create`, {
                     name: name,
                     parent_id: this.folder_id
                 });
             if (request.status === 200) {
+                console.log(request);
                 this.$refs.dropzone.manuallyAddFile({
-                    id: item.id,
+                    id: request.data.new_id,
                     size: 0,
                     name: name,
-                    date: item.created_at,
-                    type: "folder",
+                    date: (new Date()).toDateString(),
+                    itemType: "folder",
                 }, ``);
                 this.contextMenuHidden = true;
             }
         },
         // TODO: error handling
-        async trashFile(fileId) {
-            const request = await axios.delete(`/files/trash/${fileId}`);
-            if (request.status === 200) {
-                this.$refs.dropzone.removeFile(this.dzitems.find((file) => file.id === fileId));
-                this.contextMenuHidden = true;
-            }
+        async trashFile(fileIds) {
+            for (let item of fileIds.split(",")) {
+                if (!item) continue;
+                const thisItem = this.dzitems.find((file) => file.id === item);
+                const request = await axios.delete(`/${thisItem.itemType}/trash/${item}`);
 
+                if (request.status === 200) {
+                    this.$refs.dropzone.removeFile(thisItem);
+                    this.contextMenuHidden = true;
+                }
+            }
         }
     }
 }

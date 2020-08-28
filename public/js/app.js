@@ -1920,6 +1920,12 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 //
 //
 //
@@ -1963,7 +1969,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["hidden", "id"],
+  props: ["hidden", "ids"],
   data: function data() {
     return {};
   },
@@ -1971,7 +1977,22 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     downloadFile: function downloadFile() {
-      window.location.pathname = "/download/".concat(this.id);
+      console.log(this.ids); // TODO
+
+      var _iterator = _createForOfIteratorHelper(this.ids.split(",")),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var item = _step.value;
+          window.location.pathname = "/download/".concat(this.ids);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
       this.hidden = true;
     },
     previewFile: function previewFile() {
@@ -2000,15 +2021,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue2_dropzone__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue2_dropzone__WEBPACK_IMPORTED_MODULE_1__);
 
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 //
 //
@@ -2032,7 +2053,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       },
       contextMenuHidden: true,
-      selectedFile: "",
+      selectedItems: "",
       dzitems: []
     };
   },
@@ -2043,15 +2064,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     handleDblclick: function handleDblclick(e, item) {
       console.log(e);
 
-      if (item.type === "folder" || item.type === "upOne") {
+      if (item.itemType === "folder" || item.itemType === "upOne") {
         window.location.pathname = "/".concat(item.id);
       } else {
         this.$emit('preview-file', item.id);
       }
     },
-    onAdd: function onAdd(file) {
+    handleFileAdd: function handleFileAdd(file) {
       var _this = this;
 
+      console.log(file);
       this.dzitems.push(file);
 
       var updateElement = function updateElement(elName, data) {
@@ -2066,19 +2088,69 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
         _this.handleDblclick(e, file);
       });
-      if (file.type === "upOne") return;
+
+      if (file.itemType === "upOne") {
+        file.previewElement.addEventListener("click", function (e) {
+          e.preventDefault();
+          window.location.pathname = "/".concat(file.id);
+        });
+        return;
+      } else {
+        file.previewElement.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          if (!e.ctrlKey) {
+            var _iterator = _createForOfIteratorHelper(document.getElementById("dropzone").querySelectorAll(".highlighted")),
+                _step;
+
+            try {
+              for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                var item = _step.value;
+                item.classList.remove("highlighted");
+              }
+            } catch (err) {
+              _iterator.e(err);
+            } finally {
+              _iterator.f();
+            }
+          }
+
+          file.previewElement.classList.toggle("highlighted");
+        });
+      }
+
       file.previewElement.addEventListener("contextmenu", function (e) {
         e.preventDefault();
 
         _this.openContextMenu(e, file);
       });
     },
+    onUploadSuccess: function onUploadSuccess(file, response) {
+      file.id = response.id;
+      file.itemType = response.type;
+      this.handleFileAdd(file);
+    },
     template: function template() {
       return "<div class=\"dz-preview dz-file-preview\">\n                <span class=\"hidden\" data-id=\"\"></span>\n                <div class=\"dz-image\">\n                    <div data-dz-thumbnail-bg></div>\n                </div>\n                <div class=\"dz-details flex\">\n                    <div class=\"dz-filename flex-1\"><span data-dz-name></span></div>\n                    <div class=\"dz-size flex-none px-5\"><span data-dz-size></span></div>\n                    <div class=\"dz-date flex-none\"><span data-dz-date></span></div>\n                </div>\n                <div class=\"dz-progress\"><span class=\"dz-upload\" data-dz-uploadprogress></span></div>\n                <div class=\"dz-error-message\"><span data-dz-errormessage></span></div>\n                <div class=\"dz-success-mark\"><i class=\"fa fa-check\"></i></div>\n                <div class=\"dz-error-mark\"><i class=\"fa fa-close\"></i></div>\n            </div>\n        ";
     },
     openContextMenu: function openContextMenu(e, file) {
       this.contextMenuHidden = false;
-      this.selectedFile = file.id;
+
+      var _iterator2 = _createForOfIteratorHelper(document.getElementById("dropzone").querySelectorAll(".highlighted")),
+          _step2;
+
+      try {
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var item = _step2.value;
+          // not cool!
+          this.selectedItems += ",".concat(item.children[0].innerText);
+        }
+      } catch (err) {
+        _iterator2.e(err);
+      } finally {
+        _iterator2.f();
+      }
+
       var menu = document.getElementById("context-menu");
       menu.style.left = "".concat(e.clientX, "px");
       menu.style.top = "".concat(e.clientY, "px");
@@ -2091,14 +2163,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var response, _iterator, _step, _item, _iterator2, _step2, _item2;
+        var response, _iterator3, _step3, item, _iterator4, _step4, _item;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return fetch("/api/".concat(_this2.folder_id)).then(function (value) {
+                return fetch("/folder/".concat(_this2.folder_id)).then(function (value) {
                   return value.json();
                 });
 
@@ -2111,48 +2183,48 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     size: 0,
                     name: "Up",
                     date: "",
-                    type: "upOne"
+                    itemType: "upOne"
                   }, "");
                 }
 
-                _iterator = _createForOfIteratorHelper(response.folders);
+                _iterator3 = _createForOfIteratorHelper(response.folders);
 
                 try {
-                  for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                    _item = _step.value;
+                  for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+                    item = _step3.value;
 
                     _this2.$refs.dropzone.manuallyAddFile({
-                      id: _item.id,
+                      id: item.id,
                       size: 0,
-                      name: _item.name,
-                      date: _item.created_at,
-                      type: "folder"
+                      name: item.name,
+                      date: item.created_at,
+                      itemType: "folder"
                     }, "");
                   }
                 } catch (err) {
-                  _iterator.e(err);
+                  _iterator3.e(err);
                 } finally {
-                  _iterator.f();
+                  _iterator3.f();
                 }
 
-                _iterator2 = _createForOfIteratorHelper(response.files);
+                _iterator4 = _createForOfIteratorHelper(response.files);
 
                 try {
-                  for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-                    _item2 = _step2.value;
+                  for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+                    _item = _step4.value;
 
                     _this2.$refs.dropzone.manuallyAddFile({
-                      id: _item2.id,
-                      size: _item2.bytes,
-                      name: _item2.real_name,
-                      date: _item2.created_at,
-                      type: "file"
-                    }, "/api/preview/".concat(_item2.id));
+                      id: _item.id,
+                      size: _item.bytes,
+                      name: _item.real_name,
+                      date: _item.created_at,
+                      itemType: "file"
+                    }, "/api/preview/".concat(_item.id));
                   }
                 } catch (err) {
-                  _iterator2.e(err);
+                  _iterator4.e(err);
                 } finally {
-                  _iterator2.f();
+                  _iterator4.f();
                 }
 
               case 8:
@@ -2175,7 +2247,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 name = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : "none";
                 _context2.next = 3;
-                return axios.post("/folders/create", {
+                return axios.post("/folder/create", {
                   name: name,
                   parent_id: _this3.folder_id
                 });
@@ -2184,12 +2256,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 request = _context2.sent;
 
                 if (request.status === 200) {
+                  console.log(request);
+
                   _this3.$refs.dropzone.manuallyAddFile({
-                    id: item.id,
+                    id: request.data.new_id,
                     size: 0,
                     name: name,
-                    date: item.created_at,
-                    type: "folder"
+                    date: new Date().toDateString(),
+                    itemType: "folder"
                   }, "");
 
                   _this3.contextMenuHidden = true;
@@ -2204,35 +2278,104 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     // TODO: error handling
-    trashFile: function trashFile(fileId) {
+    trashFile: function trashFile(fileIds) {
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
-        var request;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+        var _iterator5, _step5, _loop, _ret;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
-                return axios["delete"]("/files/trash/".concat(fileId));
+                _iterator5 = _createForOfIteratorHelper(fileIds.split(","));
+                _context4.prev = 1;
+                _loop = /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _loop() {
+                  var item, thisItem, request;
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _loop$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          item = _step5.value;
 
-              case 2:
-                request = _context3.sent;
+                          if (item) {
+                            _context3.next = 3;
+                            break;
+                          }
 
-                if (request.status === 200) {
-                  _this4.$refs.dropzone.removeFile(_this4.dzitems.find(function (file) {
-                    return file.id === fileId;
-                  }));
+                          return _context3.abrupt("return", "continue");
 
-                  _this4.contextMenuHidden = true;
-                }
+                        case 3:
+                          thisItem = _this4.dzitems.find(function (file) {
+                            return file.id === item;
+                          });
+                          _context3.next = 6;
+                          return axios["delete"]("/".concat(thisItem.itemType, "/trash/").concat(item));
+
+                        case 6:
+                          request = _context3.sent;
+
+                          if (request.status === 200) {
+                            _this4.$refs.dropzone.removeFile(thisItem);
+
+                            _this4.contextMenuHidden = true;
+                          }
+
+                        case 8:
+                        case "end":
+                          return _context3.stop();
+                      }
+                    }
+                  }, _loop);
+                });
+
+                _iterator5.s();
 
               case 4:
+                if ((_step5 = _iterator5.n()).done) {
+                  _context4.next = 11;
+                  break;
+                }
+
+                return _context4.delegateYield(_loop(), "t0", 6);
+
+              case 6:
+                _ret = _context4.t0;
+
+                if (!(_ret === "continue")) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt("continue", 9);
+
+              case 9:
+                _context4.next = 4;
+                break;
+
+              case 11:
+                _context4.next = 16;
+                break;
+
+              case 13:
+                _context4.prev = 13;
+                _context4.t1 = _context4["catch"](1);
+
+                _iterator5.e(_context4.t1);
+
+              case 16:
+                _context4.prev = 16;
+
+                _iterator5.f();
+
+                return _context4.finish(16);
+
+              case 19:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee3, null, [[1, 13, 16, 19]]);
       }))();
     }
   }
@@ -38587,7 +38730,7 @@ var render = function() {
       {
         staticClass: "absolute z-10 bg-white",
         class: { hidden: _vm.hidden },
-        attrs: { id: "context-menu", "data-selected-id": _vm.id }
+        attrs: { id: "context-menu", "data-selected-ids": _vm.ids }
       },
       [
         _c(
@@ -38626,7 +38769,7 @@ var render = function() {
             staticClass: "trash-wrapper",
             on: {
               click: function($event) {
-                return _vm.$emit("trash-file", _vm.id)
+                return _vm.$emit("trash-file", _vm.ids)
               }
             }
           },
@@ -38645,7 +38788,7 @@ var render = function() {
             staticClass: "properties-wrapper",
             on: {
               click: function($event) {
-                return _vm.$emit("show-properties", _vm.id)
+                return _vm.$emit("show-properties", _vm.ids)
               }
             }
           },
@@ -38714,13 +38857,14 @@ var render = function() {
           options: _vm.dropzoneOptions
         },
         on: {
-          "vdropzone-file-added": _vm.onAdd,
-          "vdropzone-sending": _vm.onSend
+          "vdropzone-sending": _vm.onSend,
+          "vdropzone-success": _vm.onUploadSuccess,
+          "vdropzone-file-added-manually": _vm.handleFileAdd
         }
       }),
       _vm._v(" "),
       _c("context-menu", {
-        attrs: { id: _vm.selectedFile, hidden: _vm.contextMenuHidden },
+        attrs: { ids: _vm.selectedItems, hidden: _vm.contextMenuHidden },
         on: {
           "trash-file": _vm.trashFile,
           "create-new-folder": _vm.createFolder
@@ -51152,8 +51296,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\hvssz\Desktop\filehost\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\hvssz\Desktop\filehost\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/hvs/Desktop/projects/FILe-hosting-site/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/hvs/Desktop/projects/FILe-hosting-site/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

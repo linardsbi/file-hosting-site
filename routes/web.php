@@ -3,7 +3,8 @@
 use App\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Folder;
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,24 +24,32 @@ Route::get('/', function () {
     }
 });
 
-Route::get('/download/{file_id}', function ($id) {
-    $file = File::find($id);
-    if ($file) {
-        //$localfile = file_get_contents(base_path() . "\\storage\\app\\uploads\\$file->name");
-        return response()->download(storage_path('app/uploads') ."/". $file->name, $file->real_name);
-    }
-    else {
-        abort(404);
-    }
+Route::get('/download/{file_id}', "FileController@download");
+
+Route::get('/test/{user_id}/{item_id}/{access_type}', function ($user_id, $item_id, $access_type) {
+    dd(DB::select("select pt.id from access_permissions as ap
+    left join permission_types as pt on ap.permission_id = pt.id
+    left join users as u on ap.user_id = u.id
+    where u.email='guest'
+    and (ap.folder_id='{$item_id}' or ap.file_id='{$item_id}')
+    and pt.name='{$access_type}'", [1]));
 });
 
-Route::post('/upload', 'FileController@store');
+Route::get('/folder/{folder_id}', "FolderController@show");
 
 Auth::routes();
 
-Route::delete('/files/trash/{id}', 'FileController@trash');
-Route::post('/files/rename/{id}', 'FileController@rename');
-
-Route::post('/folders/create', 'FolderController@store');
-
 Route::get('/{folder_id}', 'HomeController@show')->name('root_folder');
+
+Route::post('/upload', 'FileController@store');
+
+Route::delete('/file/trash/{id}', 'FileController@trash');
+Route::post('/file/rename', 'FileController@rename');
+
+Route::post('/folder/create', 'FolderController@store');
+Route::delete('/folder/trash/{id}', 'FolderController@trash');
+Route::post('/folder/rename', 'FolderController@rename');
+
+Route::get('/trash', "FolderController@showTrash");
+Route::get('/shared', "FolderController@showShared");
+

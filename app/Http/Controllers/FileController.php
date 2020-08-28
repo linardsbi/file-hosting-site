@@ -58,7 +58,7 @@ class FileController extends Controller
         $file->storeAs('uploads', $fileRow->name);
 
         $fileRow->save();
-        return response()->json(['success'=>'You have successfully upload file.']);
+        return response()->json(['success'=>'true', 'id' => $fileRow->id, 'type' => 'file']);
     }
 
     /**
@@ -92,7 +92,7 @@ class FileController extends Controller
      */
     public function update(Request $request, File $file)
     {
-        //
+
     }
 
     /**
@@ -103,8 +103,14 @@ class FileController extends Controller
      */
     public function trash(Request $request, $id)
     {
-        File::find($id)->delete();
-        return response("success");
+        $file = File::find($id);
+
+        if ($file && Auth::user()->can("delete", $file)) {
+            $file->delete();
+            return response("success");
+        } else {
+            return response("fail");
+        }
     }
 
     /**
@@ -115,12 +121,43 @@ class FileController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        File::find($id)->forceDelete();
+        $file = File::find($id);
+        if ($file && Auth::user()->can("forceDelete", $file)) {
+            $file->forceDelete();
+            return response("success");
+        } else {
+            return response("fail");
+        }
+    }
+
+    public function rename(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'file_id' => 'required|uuid|exists:files,id',
+            'name' => 'required|string|max:128|min:1'
+        ]);
+
+        if (isset($validated["errors"])) {
+            return response($validated["errors"], 403)->withErrors($validated["errors"]);
+        }
+
+        $file = File::find($validated["file_id"]);
+
+        if (Auth::user()->cant("update", $file)) {
+            return response(["error" => __("You are not allowed to edit folders in this directory")]);
+        }
+
+        $file->name = $validated["name"];
+        $file->save();
         return response("success");
     }
 
-    public function rename(Request $request)
-    {
-        dd($request);
+    public function download(Request $request, $id) {
+        $file = File::find($id);
+
+        if ($file && Auth::user()->can("view", $file)) {
+        } else {
+            return response(["error" => __("You are not allowed to access this resource")]);
+        }
     }
 }

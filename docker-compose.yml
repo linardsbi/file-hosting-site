@@ -40,24 +40,43 @@ services:
 
   #MySQL Service
   db:
-    image: mysql:5.7.22
+    image: mysql:latest
     container_name: db
     restart: unless-stopped
     tty: true
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql
     volumes:
-      - dbdata:/var/lib/mysql/
+      - /home/hvs/mysql:/var/lib/mysql/
       - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
       - app-network
+
+  # phpMyAdmin container
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    networks:
+      - app-network
+
+    ports:
+      - "8080:8080"
+    # Pass a list of environment variables to the container
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      - PMA_ARBITRARY=1
+
+    depends_on:
+      - db
 
 #Docker Networks
 networks:
