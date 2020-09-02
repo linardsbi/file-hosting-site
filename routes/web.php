@@ -39,15 +39,18 @@ Route::get('/folder/{folder_id}', "FolderController@show");
 
 Auth::routes();
 
+
+
 Route::get('/{folder_id}', 'HomeController@show')->name('root_folder');
 
 Route::post('/upload', 'FileController@store');
 
-Route::delete('/file/trash/{id}', 'FileController@trash');
+Route::get('/file/preview/{id}', 'FileController@previewThumbnail');
+Route::delete('/file/trash/{ids}', 'FileController@trash');
 Route::post('/file/rename', 'FileController@rename');
 
 Route::post('/folder/create', 'FolderController@store');
-Route::delete('/folder/trash/{id}', 'FolderController@trash');
+Route::delete('/folder/trash/{ids}', 'FolderController@trash');
 Route::post('/folder/rename', 'FolderController@rename');
 
 Route::get('/trash', "FolderController@showTrash");

@@ -9,18 +9,22 @@ WORKDIR /var/www
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
+    libzip-dev \
+    libpng-dev \
+    libgs-dev \
 #    mysql-client \
     locales \
     git \
     unzip \
     zip \
-    curl
+    curl \
+    ghostscript
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
-RUN docker-php-ext-install pdo_mysql exif pcntl
+RUN docker-php-ext-install pdo_mysql exif pcntl zip gd
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -34,6 +38,8 @@ COPY . /var/www
 
 # Copy existing application directory permissions
 COPY --chown=www:www . /var/www
+
+#RUN mkdir /var/www/storage/app/archives
 
 # Change current user to www
 USER www

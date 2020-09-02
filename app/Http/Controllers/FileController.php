@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\FileType;
+use ZipArchive;
+use Intervention\Image\Facades\Image;
 
 class FileController extends Controller
 {
@@ -28,6 +30,25 @@ class FileController extends Controller
     public function create()
     {
         //
+    }
+
+    private function isImage($filename) {
+        $explodeImage = explode('.', $filename);
+        $extension = end($explodeImage);
+
+        return in_array($extension, config("folder.image_extensions"));
+    }
+
+    private function makeThumbnail($file, $dbFile) {
+        if ($this->isImage($dbFile->real_name)) {
+            Image::make($file)
+            ->resize(200, 200)
+            ->save(public_path('thumbnails') . "/$dbFile->id-sm.png", 50, "png");
+        } else if ($dbFile->extension() == "pdf") {
+            $inputDir = storage_path("app/uploads/") . $dbFile->name;
+            $outputDir = public_path('thumbnails') . "/$dbFile->id-sm.png";
+            exec("gs -sDEVICE=png16m -dPDFFitPage=true -dFirstPage=1 -dLastPage=1 -dDEVICEWIDTHPOINTS=250 -dDEVICEHEIGHTPOINTS=250 -sOutputFile='$outputDir' '$inputDir'");
+        }
     }
 
     /**
@@ -58,7 +79,19 @@ class FileController extends Controller
         $file->storeAs('uploads', $fileRow->name);
 
         $fileRow->save();
+
+        //thumbnail
+        $this->makeThumbnail($file, $fileRow);
+
+
         return response()->json(['success'=>'true', 'id' => $fileRow->id, 'type' => 'file']);
+    }
+
+    public function previewThumbnail($id)
+    {
+        $id = explode(".", $id)[0];
+        $file = File::find($id);
+        return response()->file(public_path('thumbnails') . "/{$file->name}-sm");
     }
 
     /**
@@ -101,16 +134,24 @@ class FileController extends Controller
      * @param  \App\File  $file
      * @return \Illuminate\Http\Response
      */
-    public function trash(Request $request, $id)
+    public function trash(Request $request, $ids)
     {
-        $file = File::find($id);
-
-        if ($file && Auth::user()->can("delete", $file)) {
-            $file->delete();
-            return response("success");
-        } else {
-            return response("fail");
+        if (!$ids) {
+            return response()->json(["error" => "files.trash.error"]);
         }
+
+        $ids = explode(",", $ids);
+
+        foreach($ids as $id) {
+            $file = File::find($id);
+            if ($file && Auth::user()->can("delete", $file)) {
+                $file->delete();
+            } else {
+                return response()->json(["success" => "files.trash.notallowed"]);
+            }
+        }
+
+        return response()->json(["success" => "files.trash.success"]);
     }
 
     /**
@@ -119,14 +160,22 @@ class FileController extends Controller
      * @param  \App\File  $file
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $ids)
     {
-        $file = File::find($id);
-        if ($file && Auth::user()->can("forceDelete", $file)) {
-            $file->forceDelete();
-            return response("success");
-        } else {
-            return response("fail");
+        if (!$ids) {
+            return response()->json(["error" => "files.delete.error"]);
+        }
+
+        $ids = explode(",", $ids);
+
+        foreach($ids as $id) {
+            $file = File::find($id);
+            if ($file && Auth::user()->can("forceDelete", $file)) {
+                $file->forceDelete();
+                return response("success");
+            } else {
+                return response("fail");
+            }
         }
     }
 
@@ -152,12 +201,44 @@ class FileController extends Controller
         return response("success");
     }
 
-    public function download(Request $request, $id) {
-        $file = File::find($id);
+    private function makeZip($ids) {
+        $zip = new ZipArchive();
+        $date = date("Ymd");
+        $username = Auth::user()->name;
 
-        if ($file && Auth::user()->can("view", $file)) {
+        $fileName = "{$date}-{$username}-archive.zip";
+
+        if ($zip->open(storage_path("app/archives/{$fileName}"), ZipArchive::CREATE) === TRUE)
+        {
+            foreach ($ids as $id) {
+                $dbFile = File::find($id);
+                if ($dbFile) {
+                    $zip->addFile(storage_path("app/uploads/{$dbFile->name}"), $dbFile->real_name);
+                }
+            }
+
+            $zip->close();
         } else {
-            return response(["error" => __("You are not allowed to access this resource")]);
+            return response()->json(["error" => "files.download.ziperror"]);
+        }
+
+        return $fileName;
+    }
+
+    public function download(Request $request, $ids) {
+        if (!$ids) {
+            return response()->json(["error" => "files.download.error"]);
+        }
+
+        $ids = explode(",", $ids);
+
+        if (count($ids) > 1) {
+            $filename = $this->makeZip($ids);
+            return response()->download(storage_path("app/archives/{$filename}"));
+        } else {
+            $file = File::find($ids[0]);
+            $filename = $file->name;
+            return response()->download(storage_path("app/uploads/{$filename}"), $file->real_name);
         }
     }
 }

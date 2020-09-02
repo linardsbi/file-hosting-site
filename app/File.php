@@ -16,4 +16,9 @@ class File extends Model
     public function folder() {
         return $this->hasOne("App\Folder", "id", "folder_id");
     }
+
+    public function extension() {
+        $str = explode(".", $this->real_name);
+        return end($str);
+    }
 }

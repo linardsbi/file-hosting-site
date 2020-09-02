@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\User;
+use Illuminate\Support\Facades\App;
 
 class EmptyFileException extends Exception {}
 
@@ -33,13 +34,13 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        foreach(["root", "trash", "regular"] as $folderType) {
+        foreach(config("folder.folder_types") as $folderType) {
             DB::table('folder_types')->insertOrIgnore([
                 'name' => $folderType,
             ]);
         }
 
-        foreach(["read", "write"] as $permissionType) {
+        foreach(config("folder.permission_types") as $permissionType) {
             DB::table('permission_types')->insertOrIgnore([
                 'name' => $permissionType,
             ]);

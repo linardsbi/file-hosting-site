@@ -1,6 +1,6 @@
 <template>
     <div class="context-wrapper">
-        <div id="context-menu" :data-selected-ids="ids" v-bind:class="{ hidden: hidden }" class="absolute z-10 bg-white">
+        <div id="context-menu" :data-selected-ids="ids" v-if="!hidden && !isHidden" class="absolute z-10 bg-white">
             <div v-on:click="previewFile" class="preview-wrapper">
                 <span class="preview-icon">
                 </span>
@@ -34,9 +34,6 @@
                 <div>New Folder</div>
             </div>
         </div>
-        <div id="context-overlay">
-
-        </div>
     </div>
 </template>
 
@@ -46,28 +43,23 @@ export default {
     props: ["hidden", "ids"],
     data: function () {
         return {
-
+            isHidden: false,
         }
     },
     mounted() {
-        //console.log('Component mounted.')
     },
     methods: {
         downloadFile() {
-            console.log(this.ids);
-            // TODO
-            for (let item of this.ids.split(",")) {
-                window.location.pathname = `/download/${this.ids}`;
-            }
-            this.hidden = true;
+            window.location.pathname = `/download/${this.ids.slice(0,-1)}`;
+            this.isHidden = true;
         },
         previewFile() {
 
-            this.hidden = true;
+            this.isHidden = true;
         },
         renameFile() {
 
-            this.hidden = true;
+            this.isHidden = true;
         }
     }
 }
