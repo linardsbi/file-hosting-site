@@ -1,6 +1,6 @@
 <template>
     <div class="context-wrapper">
-        <div id="context-menu" :data-selected-ids="ids" v-if="!hidden && !isHidden" class="absolute z-10 bg-white">
+        <div id="context-menu" :data-selected-ids="ids" v-if="!isHidden" class="absolute z-10 bg-white">
             <div v-on:click="previewFile" class="preview-wrapper">
                 <span class="preview-icon">
                 </span>
@@ -43,7 +43,7 @@ export default {
     props: ["hidden", "ids"],
     data: function () {
         return {
-            isHidden: false,
+            isHidden: true,
         }
     },
     mounted() {
@@ -54,13 +54,16 @@ export default {
             this.isHidden = true;
         },
         previewFile() {
-
+            this.$emit("open-modal", "preview");
             this.isHidden = true;
         },
         renameFile() {
-
+            this.$emit("open-modal", "rename");
             this.isHidden = true;
-        }
+        },
+        open() {
+            this.isHidden = false;
+        },
     }
 }
 </script>

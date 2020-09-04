@@ -5,7 +5,7 @@ namespace App\Observers;
 use App\File;
 use Illuminate\Support\Facades\DB;
 use App\Permission;
-
+use Illuminate\Support\Facades\Storage;
 class FileObserver
 {
     /**
@@ -69,6 +69,7 @@ class FileObserver
      */
     public function forceDeleted(File $file)
     {
-        //
+        Storage::delete("/uploads/{$file->name}");
+        unlink(public_path('thumbnails') . "/$file->id-sm.png");
     }
 }

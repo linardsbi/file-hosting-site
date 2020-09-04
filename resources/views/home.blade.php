@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container mx-auto">
 
     @if (session('status'))
         <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md" role="alert">
@@ -16,6 +16,5 @@
     @endif
 
     <folder-component></folder-component>
-
 </div>
 @endsection

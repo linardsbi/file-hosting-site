@@ -47,7 +47,7 @@ class FileController extends Controller
         } else if ($dbFile->extension() == "pdf") {
             $inputDir = storage_path("app/uploads/") . $dbFile->name;
             $outputDir = public_path('thumbnails') . "/$dbFile->id-sm.png";
-            exec("gs -sDEVICE=png16m -dPDFFitPage=true -dFirstPage=1 -dLastPage=1 -dDEVICEWIDTHPOINTS=250 -dDEVICEHEIGHTPOINTS=250 -sOutputFile='$outputDir' '$inputDir'");
+            exec("gs -sDEVICE=png16m -dDownScaleFactor=4 -dPDFFitPage=true -dFirstPage=1 -dLastPage=1 -sPAPERSIZE=a4 -sOutputFile='$outputDir' '$inputDir'");
         }
     }
 

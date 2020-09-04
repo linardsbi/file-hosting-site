@@ -1,8 +1,14 @@
 <template>
-    <div v-on:keyup.alt="selectAll" id="folder" class="min-h-screen flex">
-        <div id="go-up" :class="{ hidden: !parent_id }" :data-parent-id="parent_id" v-on:dblclick="goUp">Go up</div>
-        <vue-dropzone :include-styling="false" ref="dropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-thumbnail="thumbnail" v-on:vdropzone-sending="onSend" v-on:vdropzone-success="onUploadSuccess" v-on:vdropzone-file-added-manually="handleFileAdd"></vue-dropzone>
-        <context-menu v-if="!contextMenuHidden" v-on:trash-file="trashFile" v-on:create-new-folder="createFolder" :ids="selectedItems"></context-menu>
+    <div v-on:keyup.alt="selectAll" id="folder" class="min-h-screen">
+        <button id="go-up" class="mb-4 flex bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" :class="{ hidden: !parent_id }" :data-parent-id="parent_id" v-on:dblclick="goUp">
+            <svg class="up-icon mr-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+            </svg>
+            Go up
+        </button>
+        <vue-dropzone class="w-full flex flex-wrap" :include-styling="false" ref="dropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-thumbnail="thumbnail" v-on:vdropzone-sending="onSend" v-on:vdropzone-success="onUploadSuccess" v-on:vdropzone-file-added-manually="handleFileAdd"></vue-dropzone>
+        <context-menu ref="contextMenu" v-on:open-modal="openModal" v-on:trash-file="trashFile" v-on:create-new-folder="createFolder" :ids="selectedItems"></context-menu>
+        <modal ref="modal"></modal>
     </div>
 </template>
 <script>
@@ -33,12 +39,18 @@ export default {
         this.loadFolder();
     },
     methods: {
+        openModal: function (data) {
+            console.log(data);
+            this.$refs.modal.close();
+        },
         selectAll: function (e) {
             console.log(e)
         },
         goUp: function (e) {
             window.location.pathname = `/${e.target.getAttribute("data-parent-id")}`;
         },
+        // this function should be replaced with a function that gets the thumbnail
+        // when the 'success' event is fired
         thumbnail: function(file, dataUrl) {
             var j, len, ref, thumbnailElement;
             if (file.previewElement) {
@@ -47,7 +59,7 @@ export default {
                 for (j = 0, len = ref.length; j < len; j++) {
                     thumbnailElement = ref[j];
                     thumbnailElement.alt = file.name;
-                    thumbnailElement.style.backgroundImage = 'url("' + dataUrl + '")';
+                    thumbnailElement.style.backgroundImage = `url('thumbnails/${file.id}-sm.png')`;
                 }
                 return setTimeout(((function (_this) {
                     return function () {
@@ -109,28 +121,34 @@ export default {
 
         template: function () {
             return `
-            <div class="max-w-sm w-full lg:max-w-full lg:flex">
+            <div class="cursor-pointer mb-2 mr-2 lg:flex">
                 <span class="hidden" data-id=""></span>
-                <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
+                <div class="border-l border-b border-gray-400 lg:border-t lg:border-gray-400 rounded-b lg:rounded-b-none lg:rounded-r flex lg:h-auto lg:w-24 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
                     data-dz-thumbnail-bg>
-                    <svg class="folder-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="flex-1 file-icon relative" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <svg class="flex-1 folder-icon relative" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
                     </svg></div>
 
                 <div
                     class="border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
-                    <div class="mb-8">
+                    <div class="mb-1">
                         <p class="text-sm text-gray-600 flex items-center">
                             <svg class="text-gray-500 w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Expires at <span data-dz-expiration></span>
+                            Expires at <span data-dz-expiration class="ml-1"></span>
                         </p>
                         <div class="text-gray-900 font-bold text-xl mb-2" data-dz-name></div>
-                        <p class="text-gray-700 text-base" data-dz-description></p>
+
                     </div>
                     <div class="flex items-center">
                         <div class="text-sm">
@@ -149,12 +167,10 @@ export default {
                 this.contextMenuHidden = true;
                 return;
             } else {
-                // fileElement.siblings().removeClass("highlighted");
                 fileElement.addClass("highlighted");
             }
-            console.log(true)
 
-            this.contextMenuHidden = false;
+            this.$refs.contextMenu.open();
             this.selectedItems = "";
             for (let item of document.getElementById("dropzone").querySelectorAll(".highlighted > [data-id]")) {
                 // not cool!

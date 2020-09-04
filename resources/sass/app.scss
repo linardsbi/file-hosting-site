@@ -30,3 +30,16 @@ html,body {
 .file .folder-icon {
     display: none;
 }
+
+.folder .file-icon {
+    display: none;
+}
+
+.file-icon, .folder-icon {
+    z-index: -1;
+}
+
+.up-icon {
+    width: 25px;
+    transform: rotateX(-180deg) rotateY(0deg) rotate(-90deg);
+}
