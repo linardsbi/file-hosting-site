@@ -21,4 +21,8 @@ class File extends Model
         $str = explode(".", $this->real_name);
         return end($str);
     }
+
+    public function type() {
+        return $this->hasOne("App\FileType", "id", "type_id");
+    }
 }

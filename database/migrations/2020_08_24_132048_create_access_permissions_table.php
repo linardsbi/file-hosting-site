@@ -15,9 +15,10 @@ class CreateAccessPermissionsTable extends Migration
     {
         Schema::create('access_permissions', function (Blueprint $table) {
             $table->foreignId("permission_id")->references("id")->on("permission_types");
-            $table->foreignId("user_id")->references("id")->on("users");
+            $table->foreignId("user_id")->nullable();
             $table->foreignUuid("folder_id")->nullable();
             $table->foreignUuid("file_id")->nullable();
+            $table->ipAddress("ip")->nullable();
             $table->timestamps();
         });
     }

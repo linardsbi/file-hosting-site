@@ -40,8 +40,7 @@ export default {
     },
     methods: {
         openModal: function (data) {
-            console.log(data);
-            this.$refs.modal.close();
+            this.$refs.modal.open(data);
         },
         selectAll: function (e) {
             console.log(e)
@@ -79,6 +78,7 @@ export default {
         handleFileAdd(file) {
             this.dzitems.push(file);
             file.previewElement.classList.add(file.itemType);
+            file.previewElement.setAttribute(`data-type`, file.itemType);
 
             const updateElement = (elName, data) => {
                 file.previewElement.querySelector(`[data-${elName}]`).innerHTML = data;
@@ -170,7 +170,7 @@ export default {
                 fileElement.addClass("highlighted");
             }
 
-            this.$refs.contextMenu.open();
+            this.$refs.contextMenu.open(fileElement[0]);
             this.selectedItems = "";
             for (let item of document.getElementById("dropzone").querySelectorAll(".highlighted > [data-id]")) {
                 // not cool!

@@ -43,3 +43,19 @@ html,body {
     width: 25px;
     transform: rotateX(-180deg) rotateY(0deg) rotate(-90deg);
 }
+.modal-content {
+    min-width: 24rem;
+    .modal-header {
+        font-size: 1.3rem;
+    }
+}
+
+.close {
+    &:hover {
+        color: cadetblue;
+    }
+    & > * {
+        width: 1.5rem;
+    }
+}
+

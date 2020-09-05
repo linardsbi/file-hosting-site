@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\FileType;
+use App\Permission;
 use ZipArchive;
 use Intervention\Image\Facades\Image;
 
@@ -174,8 +175,127 @@ class FileController extends Controller
                 $file->forceDelete();
                 return response("success");
             } else {
-                return response("fail");
+                return response()->json(["error" => __("files.access.error")]);
             }
+        }
+    }
+
+    public function getProperties(Request $request, $id) {
+        $file = File::find($id);
+        if ($file && Auth::user()->can("view", $file)) {
+            return response()->json([
+                "uploader" => [
+                    "value" => User::find($file->user_id)->name,
+                    "text" => __("item.uploader"),
+                ],
+                "upload_date" => [
+                    "value" => $file->created_at,
+                    "text" => __("item.upload_date"),
+                ],
+                "last_changed" => [
+                    "value" => $file->updated_at,
+                    "text" => __("item.edit_date"),
+                ],
+                "type" => [
+                    "value" => $file->type->name,
+                    "text" => __("item.type"),
+                ],
+                "expiry_date" => [
+                    "value" => $file->expires_at,
+                    "text" => __("item.expiry_date"),
+                ],
+            ]);
+        } else {
+            return response()->json(["error" => __("files.access.error")]);
+        }
+    }
+
+    private function formatPermissionsForBundle($bundle, $type) {
+        $permission_types = config("folder.permission_types");
+        $formatted = [];
+
+        /**
+         * $formatted = [
+         *      "<user_id>" => [
+         *
+         *          "<permission_type> => true,
+         *      ],
+         * ];
+         */
+        foreach ($bundle as $item) {
+            $formatted[$item->$type]["permissions"][$permission_types[$item->permission_id - 1]] = true;
+            $formatted[$item->$type]["item_name"] = ($type == "user_id") ? User::find($item->user_id)->name : "PLACEHOLDER";
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * response format:
+     * "columns" => $permission_types,
+     *   "items" => [
+     *       "ips" => [
+     *           "value" => [
+     *               [
+     *                   "name" => "87.75.25.1",
+     *                   "can" => ["read", "write"],
+     *               ],
+     *               [
+     *                   "name" => "78.54.32.1",
+     *                   "can" => ["read"],
+     *               ],
+     *           ],
+     *           "text" => __("item.ips"),
+     *       ],
+     *       "users" => [
+     *           "value" => [
+     *               [
+     *                   "name" => "Admin",
+     *                   "id" => "whatever",
+     *                   "can" => ["read", "write"],
+     *               ],
+     *               [
+     *                   "name" => "Joe",
+     *                   "id" => "whatever",
+     *                   "can" => ["read"],
+     *               ],
+     *           ],
+     *           "text" => __("item.allowed_users"),
+     *       ],
+     *       "others" => [
+     *           "value" => ["can" => ["read", "write"]],
+     *           "text" => __("item.others"),
+     *       ],
+     *   ]
+     */
+    public function getPermissions(Request $request, $id) {
+        $file = File::find($id);
+        if ($file && Auth::user()->can("view", $file)) {
+            $permission_types = config("folder.permission_types");
+
+            // $ips = Permission::where([["ip", "!=", null],["file_id",$file->id]])->get();
+            $users = Permission::where([["user_id", "!=", null],["file_id",$file->id]])->get();
+            $others = Permission::where([["user_id", User::where("email", "guest")->first()->id],["file_id",$file->id]])->get();
+
+            return response()->json([
+                "columns" => $permission_types,
+                "items" => [
+                    // "ips" => [
+                    //     "value" => $this->formatPermissionsForBundle($ips, "ip"),
+                    //     "text" => __("item.ips"),
+                    // ],
+                    "users" => [
+                        "value" => $this->formatPermissionsForBundle($users, "user_id"),
+                        "text" => __("item.allowed_users"),
+                    ],
+                    "others" => [
+                        "value" => $this->formatPermissionsForBundle($others, "user_id"),
+                        "text" => __("item.others"),
+                    ],
+                ]
+            ]);
+        } else {
+            return response()->json(["error" => __("files.access.error")]);
         }
     }
 
@@ -193,7 +313,7 @@ class FileController extends Controller
         $file = File::find($validated["file_id"]);
 
         if (Auth::user()->cant("update", $file)) {
-            return response(["error" => __("You are not allowed to edit folders in this directory")]);
+            return response()->json(["error" => __("files.access.error")]);
         }
 
         $file->name = $validated["name"];
@@ -227,7 +347,7 @@ class FileController extends Controller
 
     public function download(Request $request, $ids) {
         if (!$ids) {
-            return response()->json(["error" => "files.download.error"]);
+            return response()->json(["error" => __("files.download.id.error")]);
         }
 
         $ids = explode(",", $ids);

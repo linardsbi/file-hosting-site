@@ -12,7 +12,15 @@ export default {
                     type: button.type
                 },
                 on: {
-                    click: button.event,
+                    click: function () {
+                        if (typeof(button.event) === "string") {
+                            if (button.event === "close") {
+                                self.$emit("close-modal");
+                            }
+                        } else if (typeof(button.event) === "function") {
+                            button.event();
+                        }
+                    },
                 },
                 class: button.classList.reduce((a,b)=> (a[b]=true,a),{}),
             }, button.text));

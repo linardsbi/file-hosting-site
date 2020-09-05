@@ -46,9 +46,13 @@ Route::get('/{folder_id}', 'HomeController@show')->name('root_folder');
 Route::post('/upload', 'FileController@store');
 
 Route::get('/file/preview/{id}', 'FileController@previewThumbnail');
+Route::get('/file/properties/{id}', 'FileController@getProperties');
+Route::get('/file/permissions/{id}', 'FileController@getPermissions');
 Route::delete('/file/trash/{ids}', 'FileController@trash');
 Route::post('/file/rename', 'FileController@rename');
 
+Route::get('/folder/properties/{id}', 'FolderController@getProperties');
+Route::get('/folder/permissions/{id}', 'FolderController@getPermissions');
 Route::post('/folder/create', 'FolderController@store');
 Route::delete('/folder/trash/{ids}', 'FolderController@trash');
 Route::post('/folder/rename', 'FolderController@rename');

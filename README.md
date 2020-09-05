@@ -19,6 +19,14 @@
     1.5. Trash folder
 
     1.6. More dynamic context menu
+
+    1.7. File/Folder searching
+
+    1.8. Encryption?
+
+    1.9. File access by IP whitelist
+
+    1.10. Mass permission assignment
 2. UI
 
     2.1. UI breadcrumbs
@@ -31,10 +39,15 @@
 3. Refactoring
 
     3.1. Merge files and folders into one model entity
+
+    3.2. Error handling
+
+    3.3. Vue-ify context menu
 4. Bugs
 
-    4.1. Archives, Files don't delete
+    4.1. File icons don't show up on upload but on refresh (see comment in `FolderComponent.vue`, before 'thumbnail' method)
 
-    4.2. File icons don't show up on upload but on refresh (see comment in `FolderComponent.vue`, before 'thumbnail' method)
+    4.2. Fix file order on upload
+5. Misc.
 
-    4.3. Fix file order on upload
+    5.1. Multi-tab modal
